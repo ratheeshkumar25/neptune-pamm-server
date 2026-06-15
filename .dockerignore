@@ -1,0 +1,23 @@
+# VCS
+.git
+.gitignore
+
+# Build artifacts
+bin/
+coverage.out
+
+# Local config / secrets — never bake into the image
+.env
+*.env
+!.env.example
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Docs & CI (not needed in the build context)
+README.md
+Makefile
+Dockerfile
+.dockerignore
