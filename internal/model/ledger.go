@@ -82,7 +82,7 @@ type LedgerPosting struct {
 
 // LedgerBalance is the materialized running balance per ledger account (rebuildable).
 type LedgerBalance struct {
-	LedgerAccountID int64     `db:"ledger_account_id" json:"ledger_account_id"`
+	LedgerAccountID int64     `gorm:"primaryKey" db:"ledger_account_id" json:"ledger_account_id"`
 	Balance         Money     `db:"balance"           json:"balance"`
 	UpdatedAt       time.Time `db:"updated_at"        json:"updated_at"`
 }

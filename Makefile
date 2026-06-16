@@ -43,6 +43,23 @@ tidy: ## Sync and tidy go.mod / go.sum
 deps: ## Download modules
 	$(GO) mod download
 
+# ─── Protobuf ────────────────────────────────────────────────────────────────
+PROTO_DIR := internal/proto
+
+.PHONY: proto-tools
+proto-tools: ## Install protoc-gen-go and protoc-gen-go-grpc
+	$(GO) install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	$(GO) install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+.PHONY: proto
+proto: ## Generate Go code from .proto files (needs protoc + proto-tools)
+	@command -v protoc >/dev/null 2>&1 || { echo "protoc not installed: https://grpc.io/docs/protoc-installation/"; exit 1; }
+	PATH="$$PATH:$$($(GO) env GOPATH)/bin" protoc \
+		--proto_path=$(PROTO_DIR) \
+		--go_out=$(PROTO_DIR) --go_opt=paths=source_relative \
+		--go-grpc_out=$(PROTO_DIR) --go-grpc_opt=paths=source_relative \
+		$$(find $(PROTO_DIR) -name '*.proto')
+
 # ─── Build / Run ─────────────────────────────────────────────────────────────
 .PHONY: build
 build: ## Compile the binary into ./bin

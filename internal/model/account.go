@@ -71,7 +71,7 @@ type Account struct {
 
 // Master is the money-manager profile.
 type Master struct {
-	AccountID           int64            `db:"account_id"          json:"account_id"`
+	AccountID           int64            `gorm:"primaryKey" db:"account_id"          json:"account_id"`
 	TenantID            int64            `db:"tenant_id"           json:"tenant_id"`
 	AllocationMode      int16            `db:"allocation_mode"     json:"allocation_mode"` // 0=ByBalance 1=ByEquity
 	MinInvestment       Money            `db:"min_investment"      json:"min_investment"`
@@ -96,7 +96,7 @@ type Master struct {
 
 // Investor is the investor profile.
 type Investor struct {
-	AccountID           int64      `db:"account_id" json:"account_id"`
+	AccountID           int64      `gorm:"primaryKey" db:"account_id" json:"account_id"`
 	TenantID            int64      `db:"tenant_id"  json:"tenant_id"`
 	MasterID            *int64     `db:"master_id"  json:"master_id,omitempty"` // current connection (NULL = unconnected)
 	Sl                  *Money     `db:"sl"         json:"sl,omitempty"`        // Max Loss
@@ -117,7 +117,7 @@ type Investor struct {
 
 // Admin is the admin profile.
 type Admin struct {
-	AccountID int64 `db:"account_id" json:"account_id"`
+	AccountID int64 `gorm:"primaryKey" db:"account_id" json:"account_id"`
 	TenantID  int64 `db:"tenant_id"  json:"tenant_id"`
 	ViewOnly  bool  `db:"view_only"  json:"view_only"`
 }

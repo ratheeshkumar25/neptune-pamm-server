@@ -59,7 +59,7 @@ type FeeAccount struct {
 
 // FeeSchedule holds tenant-level default + max fee rates (TFB SetCommonSettings defaults).
 type FeeSchedule struct {
-	TenantID                   int64     `db:"tenant_id"                     json:"tenant_id"`
+	TenantID                   int64     `gorm:"primaryKey" db:"tenant_id"                     json:"tenant_id"`
 	DefaultIncentiveFee        *Money    `db:"default_incentive_fee"         json:"default_incentive_fee,omitempty"`
 	MaxIncentiveFee            *Money    `db:"max_incentive_fee"             json:"max_incentive_fee,omitempty"`
 	DefaultManagementFee       *Money    `db:"default_management_fee"        json:"default_management_fee,omitempty"`

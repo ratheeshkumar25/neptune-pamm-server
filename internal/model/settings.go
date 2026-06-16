@@ -12,7 +12,7 @@ import (
 
 // CommonSettings is the global/common settings blob (TFB SetCommonSettings). One per tenant.
 type CommonSettings struct {
-	TenantID  int64           `db:"tenant_id"  json:"tenant_id"`
+	TenantID  int64           `gorm:"primaryKey" db:"tenant_id"  json:"tenant_id"`
 	Settings  json.RawMessage `db:"settings"   json:"settings"` // alloc/withdrawal/fees/risk/plan times…
 	UpdatedAt time.Time       `db:"updated_at" json:"updated_at"`
 }
@@ -30,13 +30,13 @@ type CallbackSettings struct {
 	ID            int64          `db:"id"             json:"id"`
 	TenantID      int64          `db:"tenant_id"      json:"tenant_id"`
 	Address       string         `db:"address"        json:"address"`
-	CallbackTypes []CallbackType `db:"callback_types" json:"callback_types"`
+	CallbackTypes []CallbackType `gorm:"serializer:json" db:"callback_types" json:"callback_types"`
 	Enabled       bool           `db:"enabled"        json:"enabled"`
 }
 
 // SMTPSettings holds per-tenant outbound email config.
 type SMTPSettings struct {
-	TenantID              int64    `db:"tenant_id"              json:"tenant_id"`
+	TenantID              int64    `gorm:"primaryKey" db:"tenant_id"              json:"tenant_id"`
 	IsEnabled             bool     `db:"is_enabled"            json:"is_enabled"`
 	Host                  string   `db:"host"                  json:"host"`
 	Port                  int      `db:"port"                  json:"port"`
@@ -44,37 +44,37 @@ type SMTPSettings struct {
 	Password              string   `db:"password"              json:"-"`
 	SenderAddress         string   `db:"sender_address"        json:"sender_address"`
 	EnableSSL             bool     `db:"enable_ssl"            json:"enable_ssl"`
-	NotificationAddresses []string `db:"notification_addresses" json:"notification_addresses"`
+	NotificationAddresses []string `gorm:"serializer:json" db:"notification_addresses" json:"notification_addresses"`
 }
 
 // Currency is a configured currency (per tenant).
 type Currency struct {
-	TenantID int64   `db:"tenant_id" json:"tenant_id"`
-	Name     string  `db:"name"      json:"name"`
+	TenantID int64   `gorm:"primaryKey" db:"tenant_id" json:"tenant_id"`
+	Name     string  `gorm:"primaryKey" db:"name"      json:"name"`
 	Digits   int     `db:"digits"    json:"digits"`
 	Symbol   *string `db:"symbol"    json:"symbol,omitempty"`
 }
 
 // Language is a configured UI language (per tenant).
 type Language struct {
-	TenantID int64  `db:"tenant_id" json:"tenant_id"`
-	Code     string `db:"code"      json:"code"`
+	TenantID int64  `gorm:"primaryKey" db:"tenant_id" json:"tenant_id"`
+	Code     string `gorm:"primaryKey" db:"code"      json:"code"`
 	Enabled  bool   `db:"enabled"   json:"enabled"`
 }
 
 // WebSettings / WebColors / WebIframe hold low-churn JSONB web/theming config.
 type WebSettings struct {
-	TenantID int64           `db:"tenant_id" json:"tenant_id"`
+	TenantID int64           `gorm:"primaryKey" db:"tenant_id" json:"tenant_id"`
 	Settings json.RawMessage `db:"settings"  json:"settings"`
 }
 
 type WebColors struct {
-	TenantID int64           `db:"tenant_id" json:"tenant_id"`
+	TenantID int64           `gorm:"primaryKey" db:"tenant_id" json:"tenant_id"`
 	Settings json.RawMessage `db:"settings"  json:"settings"`
 }
 
 type WebIframe struct {
-	TenantID int64           `db:"tenant_id" json:"tenant_id"`
+	TenantID int64           `gorm:"primaryKey" db:"tenant_id" json:"tenant_id"`
 	Settings json.RawMessage `db:"settings"  json:"settings"`
 }
 
