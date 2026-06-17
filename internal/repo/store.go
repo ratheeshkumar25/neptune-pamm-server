@@ -29,15 +29,47 @@ type Store interface {
 	Atomic(ctx context.Context, fn func(s Store) error) error
 }
 
-type gormStore struct{ db *gorm.DB }
+// gormStore is a Store backed by GORM. It is the only implementation of Store in this service,
+// but the interface allows testing with a mock or in-memory store.
+type gormStore struct {
+	db *gorm.DB
+}
 
 // NewStore builds a Store backed by GORM.
-func NewStore(db *gorm.DB) Store { return &gormStore{db: db} }
+func NewStore(db *gorm.DB) Store {
+	return &gormStore{
+		db: db,
+	}
+}
 
-func (s *gormStore) Account() AccountRepository     { return &accountRepo{db: s.db} }
-func (s *gormStore) Principal() PrincipalRepository { return &principalRepo{db: s.db} }
-func (s *gormStore) Currency() CurrencyRepository   { return &currencyRepo{db: s.db} }
+// Account returns the repository for the account aggregate. Each repo is a thin wrapper
+// around GORM that translates errors to model.AppError and keeps driver details out of
+// higher layers.
+func (s *gormStore) Account() AccountRepository {
+	return &accountRepo{
+		db: s.db,
+	}
+}
 
+// Principal returns the repository for the principal aggregate. Each repo is a thin wrapper
+// around GORM that translates errors to model.AppError and keeps driver details out of
+// higher layers.
+func (s *gormStore) Principal() PrincipalRepository {
+	return &principalRepo{
+		db: s.db,
+	}
+}
+
+// Currency returns the repository for the currency aggregate. Each repo is a thin wrapper
+// around GORM that translates errors to model.AppError and keeps driver details out of
+// higher layers.
+func (s *gormStore) Currency() CurrencyRepository {
+	return &currencyRepo{
+		db: s.db,
+	}
+}
+// Atomic runs fn inside one transaction; every repo obtained from the passed Store shares
+// that transaction and is rolled back together on error.
 func (s *gormStore) Atomic(ctx context.Context, fn func(s Store) error) error {
 	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		return fn(&gormStore{db: tx})

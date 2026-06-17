@@ -14,6 +14,7 @@ import (
 
 	"neptune-pamm/github.com/ratheeshkumar25/internal/db"
 	"neptune-pamm/github.com/ratheeshkumar25/internal/repo"
+	"neptune-pamm/github.com/ratheeshkumar25/internal/services"
 	"neptune-pamm/github.com/ratheeshkumar25/pkg/config"
 	"neptune-pamm/github.com/ratheeshkumar25/pkg/logger"
 	"neptune-pamm/github.com/ratheeshkumar25/pkg/utilis"
@@ -34,6 +35,13 @@ type Container struct {
 	JS    nats.JetStreamContext
 
 	Store repo.Store
+
+	// Security primitives the transport layer needs (interceptor).
+	JWT   *utilis.JWTManager
+	Cache services.SessionCache
+
+	// Application services (depend only on the ports above).
+	Auth services.AuthService
 }
 
 // New constructs and verifies every dependency. On any failure it closes what was already
@@ -76,6 +84,14 @@ func New() (*Container, error) {
 	c.JS = js
 
 	c.Store = repo.NewStore(gdb)
+
+	// Wire application services from the concrete drivers (the only place that knows them).
+	c.JWT = utilis.NewJWTManager(
+		cfg.Auth.JWTSecret, cfg.Auth.JWTIssuer, cfg.Auth.AccessTTL(), cfg.Auth.RefreshTTL(),
+	)
+	c.Cache = utilis.NewAuthCache(rdb)
+	publisher := utilis.NewNatsPublisher(nc)
+	c.Auth = services.NewAuthService(c.Store, c.Cache, publisher, c.JWT, log)
 
 	log.Info("container initialised")
 	return c, nil

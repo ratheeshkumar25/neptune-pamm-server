@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -63,7 +64,20 @@ type RedisConfig struct {
 
 // AuthConfig holds authentication settings.
 type AuthConfig struct {
-	JWTSecret string `mapstructure:"jwt_secret"`
+	JWTSecret        string `mapstructure:"jwt_secret"`
+	JWTIssuer        string `mapstructure:"jwt_issuer"`
+	AccessTTLMinutes int    `mapstructure:"access_ttl_minutes"`
+	RefreshTTLHours  int    `mapstructure:"refresh_ttl_hours"`
+}
+
+// AccessTTL is the access-token lifetime.
+func (c AuthConfig) AccessTTL() time.Duration {
+	return time.Duration(c.AccessTTLMinutes) * time.Minute
+}
+
+// RefreshTTL is the refresh-token lifetime.
+func (c AuthConfig) RefreshTTL() time.Duration {
+	return time.Duration(c.RefreshTTLHours) * time.Hour
 }
 
 // SMTPConfig holds outbound email settings.
@@ -82,7 +96,7 @@ var envKeys = []string{
 	"mongo_uri",
 	"nats_url",
 	"redis_host", "redis_port", "redis_password", "redis_db",
-	"jwt_secret",
+	"jwt_secret", "jwt_issuer", "access_ttl_minutes", "refresh_ttl_hours",
 	"smtp_host", "smtp_port", "smtp_user", "smtp_password",
 }
 
@@ -137,6 +151,9 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("redis_host", "localhost")
 	v.SetDefault("redis_port", 6379)
 	v.SetDefault("redis_db", 0)
+	v.SetDefault("jwt_issuer", "neptune-pamm")
+	v.SetDefault("access_ttl_minutes", 15)
+	v.SetDefault("refresh_ttl_hours", 168) // 7 days
 }
 
 // validate ensures the fields the service cannot start without are present.

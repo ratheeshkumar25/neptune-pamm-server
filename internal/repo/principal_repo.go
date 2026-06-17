@@ -38,6 +38,7 @@ func (r *principalRepo) Create(ctx context.Context, p *model.Principal) error {
 	return writeErr(r.db.WithContext(ctx).Create(p).Error)
 }
 
+// GetByUsername retrieves a principal by tenant-scoped username. Returns model.ErrNotFound if not found.
 func (r *principalRepo) GetByUsername(ctx context.Context, tenantID int64, username string) (*model.Principal, error) {
 	var p model.Principal
 	err := r.db.WithContext(ctx).
@@ -49,6 +50,7 @@ func (r *principalRepo) GetByUsername(ctx context.Context, tenantID int64, usern
 	return &p, nil
 }
 
+// GetByEmail retrieves a principal by tenant-scoped email. Returns model.ErrNotFound if not found.
 func (r *principalRepo) GetByEmail(ctx context.Context, tenantID int64, email string) (*model.Principal, error) {
 	var p model.Principal
 	err := r.db.WithContext(ctx).
@@ -60,6 +62,7 @@ func (r *principalRepo) GetByEmail(ctx context.Context, tenantID int64, email st
 	return &p, nil
 }
 
+// GetByAccountID retrieves a principal by tenant-scoped account ID. Returns model.ErrNotFound if not found.
 func (r *principalRepo) GetByAccountID(ctx context.Context, tenantID, accountID int64) (*model.Principal, error) {
 	var p model.Principal
 	err := r.db.WithContext(ctx).
@@ -71,6 +74,7 @@ func (r *principalRepo) GetByAccountID(ctx context.Context, tenantID, accountID 
 	return &p, nil
 }
 
+// ExistsByUsername checks if a principal with the given username exists in the tenant. Returns true if found, false otherwise.
 func (r *principalRepo) ExistsByUsername(ctx context.Context, tenantID int64, username string) (bool, error) {
 	var count int64
 	err := r.db.WithContext(ctx).Model(&model.Principal{}).
@@ -82,6 +86,7 @@ func (r *principalRepo) ExistsByUsername(ctx context.Context, tenantID int64, us
 	return count > 0, nil
 }
 
+// SetEmailVerified marks the principal's email as verified. Returns model.ErrNotFound if the principal does not exist.
 func (r *principalRepo) SetEmailVerified(ctx context.Context, principalID int64) error {
 	res := r.db.WithContext(ctx).Model(&model.Principal{}).
 		Where("id = ?", principalID).
@@ -108,6 +113,7 @@ func (r *principalRepo) UpdateLastLogin(ctx context.Context, principalID int64, 
 	return nil
 }
 
+// UpdatePasswordHash updates the principal's password hash. Returns model.ErrNotFound if the principal does not exist.
 func (r *principalRepo) UpdatePasswordHash(ctx context.Context, principalID int64, passwordHash string) error {
 	res := r.db.WithContext(ctx).Model(&model.Principal{}).
 		Where("id = ?", principalID).
